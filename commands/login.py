@@ -1,4 +1,5 @@
 import nextcord
+from datetime import datetime
 from nextcord.ext import commands
 from typing import Optional
 import json
@@ -22,7 +23,7 @@ class LoginModal(nextcord.ui.Modal):
             max_length=200,
         )
         self.university = nextcord.ui.TextInput(
-            label="University name or acronym",
+            label="University name / Acronym",
             style=nextcord.TextInputStyle.short,
             placeholder="University of Macedonia / UOM",
             required=True,
@@ -36,6 +37,7 @@ class LoginModal(nextcord.ui.Modal):
     async def callback(self, interaction: nextcord.Interaction):
         loading_embed = nextcord.Embed(
             description="Logging in...",
+            timestamp=datetime.now(),
             color=nextcord.Color.dark_grey()
         )
         await interaction.response.send_message(embed=loading_embed, ephemeral=True)
@@ -56,13 +58,16 @@ class LoginModal(nextcord.ui.Modal):
                 data = json.load(f)
                 id = data["student"]["studentNo"]
             success_embed = nextcord.Embed(
-                description=f"Login successful. Welcome back {id}",
+                title="Login Successful",
+                description=f"Welcome back, **{id}**!",
                 color=nextcord.Color.green()
             )
             await interaction.edit_original_message(embed=success_embed)
         else:
             error_embed = nextcord.Embed(
-                description="Login failed.",
+                title="Login Failed",
+                timestamp=datetime.now(),
+                description="Please check your credentials and try again.",
                 color=nextcord.Color.red()
             )
             await interaction.edit_original_message(embed=error_embed)
